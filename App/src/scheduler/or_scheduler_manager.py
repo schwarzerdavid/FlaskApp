@@ -3,7 +3,7 @@ from typing import Optional
 
 from App.src.consts.hospital_ors import HOSPITAL_ORS
 from App.src.consts.scheduler_consts import SCHEDULER_PERIOD_IN_DAYS, TWO_HOURS, THREE_HOURS, NO_ROOM_ASSIGNED, \
-    OR_WORKING_HOURS_A_DAY, EMPTY_SLOT_REQUEST_ID
+    OR_WORKING_HOURS_A_DAY, EMPTY_SLOT_REQUEST_ID, STARTING_HOUR_IN_DAY
 from App.src.entities.Hospital import Hospital
 from App.src.entities.assign_respone import AssignResponse
 from App.src.entities.operation_room import OperationRoom
@@ -31,6 +31,7 @@ class ORSchedulerManager:
             self._pending_requests.append(or_request)
             return AssignResponse(is_assigned=False, place_on_queue=len(self._pending_requests))
         else:
+            room_slot.starting_hour += STARTING_HOUR_IN_DAY
             return AssignResponse(is_assigned=True, room_slot=room_slot)
 
     def day_pass(self):

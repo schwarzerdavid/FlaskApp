@@ -14,11 +14,31 @@ doctor_model = get_doctor_model(or_scheduler_api_ns)
 
 
 @or_scheduler_api_ns.route('/request_time')
-class RequestSpot(Resource):
+class RequestTime(Resource):
     @or_scheduler_api_ns.expect(doctor_model)
     def post(self):
-        """A Doctor requests the next available operation slot
-        :returns: the operation room id + time, or place in queue"""
+        """
+        Request the next available operating room slot.
+
+        Accepts a doctor type and returns either:
+        - a scheduled operation room slot with room ID, day, and hour
+        - or the doctor's place in the pending queue if no room is available
+
+        **Request Body:**
+        - doctor_type (str): One of the supported doctor types, e.g., "HEART_SURGEON", "BRAIN_SURGEON"
+
+        **Responses:**
+        - 200 OK: JSON object with assignment result and slot details or queue position
+
+                  JSON structure:
+                  { "is_assigned": True for time assigned, False for getting request to queue,
+                    "starting_day": if assigned -> days from tomorrow (0 - tomorrow, 1 - the after, etc.
+                    "starting_hour": if assigned -> hour in the day
+                    "room_id": if assigned -> operation room id
+                    "place_in_queue": if not assigned -> place in queue
+                 }
+        - 400 Bad Request: Invalid doctor_type provided
+        """
         data = request.json
         try:
             doctor_type = DoctorTypes(data['doctor_type'])
@@ -34,3 +54,20 @@ class RequestSpot(Resource):
                  "room_id": response.room_slot.room_id if response.room_slot else None,
                  "place_in_queue": response.place_on_queue
                  }
+
+@or_scheduler_api_ns.route('/day_passed')
+class RequestSpot(Resource):
+    def post(self):
+        """
+        Advance the scheduler to the next day.
+
+        Simulates the passing of a hospital day:
+        - Clears out passed operation slots
+        - Frees up time in the operation room schedule
+        - Schedule Requests from queue if exist
+
+        **Responses:**
+        - 200 OK: The day was successfully advanced
+        """
+        global_scheduler_manager.day_pass()
+        return {}, 200
