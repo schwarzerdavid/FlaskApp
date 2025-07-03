@@ -9,7 +9,7 @@ from App.src.models.doctor_model import get_doctor_model
 
 or_scheduler_api = Blueprint('or_scheduler_api', __name__, url_prefix='/or_scheduler_api')
 api = Api(or_scheduler_api)
-or_scheduler_api_ns = api.namespace('or_scheduler_api', description='API for scheduling OR Rooms')
+or_scheduler_api_ns = api.namespace('', description='API for scheduling OR Rooms')
 doctor_model = get_doctor_model(or_scheduler_api_ns)
 
 
