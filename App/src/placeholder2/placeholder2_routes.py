@@ -8,5 +8,5 @@ placeholder2_ns = api.namespace('placeholder2', description='Placeholder 2')
 @placeholder2_ns.route('/')
 class Placeholder2Root(Resource):
     def get(self):
-        "placeholder 2 documentation"
+        """placeholder 2 documentation"""
         return {"placeholder2": "placeholder2"}, 200
